@@ -30,6 +30,10 @@ row = df.iloc[1]    # second Row
 item =df.iloc[2,1]
 # print(item)
 
+###  Reading it as a numpy array
+values = df.values
+# print(values)
+
 ###  To find specific row depends on multiple condition
 ###  we can say we search about something 
 fireRow = df.loc[df['Type 1'] == 'Fire']
@@ -55,6 +59,7 @@ sort_mult = df.sort_values(['Type 1','HP'])
 sort_multde = df.sort_values(['Type 1','HP'],ascending=[True,False]) ##  Sort Type1 alphabetically from A to Z and HP from High to Low
 
 
+
 ###################################################
 
 
@@ -65,7 +70,7 @@ df['Total'] = df['HP'] + df['Attack'] + df['Defense'] + df['Sp. Atk'] + df['Sp. 
 df = df.drop(columns=['Total'])  ## To delete columns 
 
 ## Another way to add colums with easiest way
-HPIndex  =  df.columns.get_loc('HP')
+HPIndex  =  df.columns.get_loc('HP')  ## git index of column
 speedIndex = df.columns.get_loc('Speed')
 df['Total'] = df.iloc[:,HPIndex:speedIndex+1].sum(axis=1)  #axis = 1 because we want sum on X axis
 
@@ -84,3 +89,6 @@ print(df.head(5))
 
 ######################################################
 
+############## calcualte Standard correlation coefficient 
+corrMat = df.corr()
+# print(corrMat)

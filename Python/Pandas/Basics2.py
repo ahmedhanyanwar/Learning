@@ -64,7 +64,8 @@ highAtt  = df.groupby('Type 1').mean().sort_values('Attack',ascending=False)
 
 ## I want to know count [number of pokemon in type 1]
 num = df.groupby(['Type 1']).count() # but there are som NAN in some colums so I will do:
-
+num = df['Type 1'].value_counts()  # but number of each member in Type 1 regardless colums
+# print(num)
 ##  To concern in count rather than blanks
 df['Count'] = 1
 num  = df.groupby(['Type 1']).count()['Count']
@@ -82,6 +83,6 @@ for df in pd.read_csv('Modified.csv',chunksize=5):
 
     # print("CHUNKS = ")
     # print(df)  ### while print 5 by 5 rows     
-print(new_df)  #### now we rdused data by another useful info
+# print(new_df)  #### now we rdused data by another useful info
 
 #############################################################

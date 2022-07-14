@@ -114,7 +114,12 @@ I = np.identity(5)
 # Repeat matrix np.repeat( array , number of repeation , axis = X or Y)
 arr = np.array([[1,2,3]])
 r1 = np.repeat(arr,3,axis=0)
-print(r1)
+# print(r1)
 
 ########################################################################################
 
+###########  np.c_
+##Translates slice objects to concatenation along the second axis.
+arr = np.c_[np.array([1,2,3]),np.array([4,5,6])]
+print("array np.c_ : ")
+# print(arr)
