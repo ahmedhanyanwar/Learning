@@ -1,5 +1,6 @@
-#### chapter 2 from 63 to end
+#### chapter 2 from 63 to 71
 import os
+from joblib import PrintTime
 import pandas as pd
 from matplotlib import pyplot as plt
 import numpy as np
@@ -57,8 +58,8 @@ for set in (strat_train_set,strat_test_set):
 ########## separate the predictors and the labels since we don’t necessarily want to apply
 #### the same transformations to the predictors and the target values
 # (note that drop() creates a copy of the data and does not affect strat_train_set)
-housing = strat_test_set.drop("median_house_value",axis=1)
-housing_labels = strat_test_set["median_house_value"].copy()
+housing = strat_train_set.drop("median_house_value",axis=1)
+housing_labels = strat_train_set["median_house_value"].copy()
 
 ########### Data Cleaning
 ###Most Machine Learning algorithms cannot work with missing features
@@ -71,7 +72,7 @@ housing.drop("total_bedrooms",axis=1)
 #   3.Set the values to some value (zero, the mean, the median, etc.).
 #### 3.1 using pandas
 median =housing["total_bedrooms"].median()
-housing["total_bedrooms"].fillna(median,inplace=True)
+# housing["total_bedrooms"].fillna(median,inplace=True)
 
 #### 3.2 using scikit-learn 
 from sklearn.impute import SimpleImputer
@@ -102,7 +103,7 @@ housing_tr = pd.DataFrame(X,columns=housingNum.columns)
 ####################    Handling Text and Categorical Attributes   #########################
 ## Better to turn it into numerical Attributes
 housingCategory = housing[["ocean_proximity"]]
-# print(housingCategory.head(10))
+print(housingCategory.head(10))
 
 from sklearn.preprocessing import OrdinalEncoder,OneHotEncoder
 ordinal_encoder = OrdinalEncoder()
@@ -168,8 +169,7 @@ housingExtraAttribs = pd.DataFrame(housingExtraAttribs,columns=col)
 # # print(des.head()[3:4])  ## Min
 # # print(des.tail()[4:5]) ## Max
 
-
-###########################   Feature scaling
+###########################       Feature scaling
 ####### 1- min-max scaling (Normalization)
 from sklearn.preprocessing import MinMaxScaler
 scale_minMax = MinMaxScaler()
@@ -183,3 +183,41 @@ scal_std = StandardScaler()
 X = scal_std.fit_transform(housingNum)
 housing_scaleStd = pd.DataFrame(X,columns=housingNum.columns)
 # print(housing_scaleStd.head(10))
+
+
+###########################       Transformation Pipelines
+## The Pipeline constructor takes a list of name/estimator pairs defining a sequence of
+# steps. All but the last estimator must be transformers (i.e., they must have a fit_transform() method).
+from sklearn.pipeline import Pipeline
+
+num_pipeline = Pipeline([
+    ('imputer',SimpleImputer(strategy='median')),
+    ('attribs_adder',CombinedAttributesAdder(add_bedrooms_per_room=False)),
+    ('stdScaler',StandardScaler())
+])
+
+housing_num_tr = num_pipeline.fit_transform(housingNum) 
+
+##  We must handle the categorical attribs and numerical in different way
+##  To solve this problem we will use this
+from sklearn.compose import ColumnTransformer
+
+num_attribs = list(housingNum)  ### This gives the columns(attributres) of housingNum
+cat_attribs = ["ocean_proximity"]
+
+full_pipeline = ColumnTransformer([
+    ("num",num_pipeline,num_attribs),
+    ("cat",OneHotEncoder(),cat_attribs)
+])
+# col = list(housing)
+# ### This cat because of oneHotEncoder
+# col.append('rooms_per_household')
+# col.append('population_per_household')
+# col.append('Cat0')  
+# col.append('Cat1')
+# col.append('Cat2')
+# col.append('Cat3')
+print(housing.head(10))
+housing_prepared = full_pipeline.fit_transform(housing)
+# housingDF = pd.DataFrame(housing_prepared,columns=col)
+# print(housingDF.head(10))s
